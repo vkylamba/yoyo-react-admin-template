@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 // material-ui
 import Button from '@mui/material/Button';
@@ -15,13 +15,14 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-// third-party
+// third party
 import * as Yup from 'yup';
 import { Formik } from 'formik';
 
-// project imports
+// project import
 import IconButton from 'components/@extended/IconButton';
 import AnimateButton from 'components/@extended/AnimateButton';
+import { login } from 'services/auth';
 
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
@@ -29,10 +30,11 @@ import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 
 // ============================|| JWT - LOGIN ||============================ //
 
-export default function AuthLogin({ isDemo = false }) {
+export default function AuthLogin() {
   const [checked, setChecked] = React.useState(false);
-
   const [showPassword, setShowPassword] = React.useState(false);
+  const navigate = useNavigate(); // Hook to navigate after successful login
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -41,12 +43,29 @@ export default function AuthLogin({ isDemo = false }) {
     event.preventDefault();
   };
 
+  const handleLogin = async (values, { setErrors, setSubmitting }) => {
+    try {
+      // Call the login method with email and password
+      await login(values.email, values.password);
+
+      // Navigate to the dashboard or desired route after successful login
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Login error:', error);
+
+      // Set form submission error
+      setErrors({ submit: error.response?.data?.message || 'Something went wrong' });
+    } finally {
+      setSubmitting(false); // Stop the form submission state
+    }
+  };
+
   return (
     <>
       <Formik
         initialValues={{
-          email: 'info@codedthemes.com',
-          password: '123456',
+          email: '',
+          password: '',
           submit: null
         }}
         validationSchema={Yup.object().shape({
@@ -56,9 +75,10 @@ export default function AuthLogin({ isDemo = false }) {
             .test('no-leading-trailing-whitespace', 'Password cannot start or end with spaces', (value) => value === value.trim())
             .max(10, 'Password must be less than 10 characters')
         })}
+        onSubmit={handleLogin} // Use the handleLogin function on form submission
       >
-        {({ errors, handleBlur, handleChange, touched, values }) => (
-          <form noValidate>
+        {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
+          <form noValidate onSubmit={handleSubmit}>
             <Grid container spacing={3}>
               <Grid size={12}>
                 <Stack sx={{ gap: 1 }}>
@@ -134,9 +154,14 @@ export default function AuthLogin({ isDemo = false }) {
                   </Link>
                 </Stack>
               </Grid>
+              {errors.submit && (
+                <Grid item xs={12}>
+                  <FormHelperText error>{errors.submit}</FormHelperText>
+                </Grid>
+              )}
               <Grid size={12}>
                 <AnimateButton>
-                  <Button fullWidth size="large" variant="contained" color="primary">
+                  <Button disabled={isSubmitting} type="submit" fullWidth size="large" variant="contained" color="primary">
                     Login
                   </Button>
                 </AnimateButton>

@@ -1,4 +1,5 @@
 import { RouterProvider } from 'react-router-dom';
+import { AuthProvider } from 'context/AuthProvider';
 
 // project imports
 import router from 'routes';
@@ -12,7 +13,9 @@ export default function App() {
   return (
     <ThemeCustomization>
       <ScrollTop>
-        <RouterProvider router={router} />
+        <AuthProvider>
++          <RouterProvider router={router} />
++        </AuthProvider>
       </ScrollTop>
     </ThemeCustomization>
   );

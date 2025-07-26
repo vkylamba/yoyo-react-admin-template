@@ -1,3 +1,4 @@
+import React from 'react';
 import { createRoot } from 'react-dom/client';
 
 // style.scss
@@ -31,18 +32,18 @@ import '@fontsource/public-sans/500.css';
 import '@fontsource/public-sans/600.css';
 import '@fontsource/public-sans/700.css';
 
-// project imports
+// project import
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+import config from './config'; // Import the config file
 
 const container = document.getElementById('root');
 const root = createRoot(container);
+document.title = config.projectTitle;
 
 // ==============================|| MAIN - REACT DOM RENDER ||============================== //
 
-root.render(<App />);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
