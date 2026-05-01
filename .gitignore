@@ -106,3 +106,63 @@ dist
 
 # wincompare file
 .bak
+
+# env files
+.env
+.env.*.local
+
+# venv
+server/.venv/
+
+# pyc files
+server/**/*.pyc
+server/**/__pycache__/
+
+# Db files
+server/**/*.db
+
+# cert files
+server/*.crt
+server/*.key
+server/*.pem
+
+# env files
+.env
+.env.*.local
+
+# venv
+server/.venv/
+
+# pyc files
+server/**/*.pyc
+server/**/__pycache__/
+
+# Db files
+server/**/*.db
+
+# cert files
+server/*.crt
+server/*.key
+server/*.pem
+
+# env files
+.env
+.env.*.local
+
+# venv
+**/.venv/
+
+# pyc files
+**/*.pyc
+**/__pycache__/
+
+# Db files
+**/*.db
+
+# cert files
+server/*.crt
+server/*.key
+server/*.pem
+
+# node modules
+node_modules/
