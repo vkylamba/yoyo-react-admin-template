@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 // material-ui
 import Button from '@mui/material/Button';
@@ -23,6 +23,8 @@ import { Formik } from 'formik';
 
 // project import
 import AnimateButton from 'components/@extended/AnimateButton';
+import { useAuth } from 'context/AuthProvider';
+import { login } from 'services/auth';
 
 // assets
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
@@ -31,16 +33,33 @@ import FirebaseSocial from './FirebaseSocial';
 
 // ============================|| JWT - LOGIN ||============================ //
 
-export default function AuthLogin({ isDemo = false }) {
+export default function AuthLogin() {
+  const { login: setAuthenticated } = useAuth();
   const [checked, setChecked] = React.useState(false);
-
   const [showPassword, setShowPassword] = React.useState(false);
+  const navigate = useNavigate();
+
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
+  };
+
+  const handleLogin = async (values, { setErrors, setSubmitting }) => {
+    try {
+      await login(values.email, values.password);
+      await setAuthenticated();
+      navigate('/dashboard/default');
+    } catch (error) {
+      console.error('Login error:', error);
+
+      // Set form submission error
+      setErrors({ submit: error.response?.data?.message || 'Something went wrong' });
+    } finally {
+      setSubmitting(false); // Stop the form submission state
+    }
   };
 
   return (
@@ -55,6 +74,7 @@ export default function AuthLogin({ isDemo = false }) {
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
           password: Yup.string().max(255).required('Password is required')
         })}
+        onSubmit={handleLogin} // Use the handleLogin function on form submission
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit}>
@@ -86,7 +106,7 @@ export default function AuthLogin({ isDemo = false }) {
                   <OutlinedInput
                     fullWidth
                     error={Boolean(touched.password && errors.password)}
-                    id="-password-login"
+                    id="password-login"
                     type={showPassword ? 'text' : 'password'}
                     value={values.password}
                     name="password"

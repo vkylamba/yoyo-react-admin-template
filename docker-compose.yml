@@ -1,0 +1,16 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    image: mantis-server:latest
+    container_name: mantis-server
+    ports:
+      - "8085:8085"
+    environment:
+      DATABASE_URL: sqlite:////app/data/mantis.db
+      SECRET_KEY: change-me-in-production
+    volumes:
+      - ./mantis.db:/app/data/mantis.db
+      - ./uploads:/app/server/uploads
+    restart: unless-stopped

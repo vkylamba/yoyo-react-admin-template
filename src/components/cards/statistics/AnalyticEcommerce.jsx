@@ -17,6 +17,9 @@ import FallOutlined from '@ant-design/icons/FallOutlined';
 const iconSX = { fontSize: '0.75rem', color: 'inherit', marginLeft: 0, marginRight: 0 };
 
 export default function AnalyticEcommerce({ color = 'primary', title, count, percentage, isLoss, extra }) {
+  const percentageNumber = Number(percentage);
+  const showPercentage = Number.isFinite(percentageNumber) && percentageNumber !== 0;
+
   return (
     <MainCard contentSX={{ p: 2.25 }}>
       <Stack spacing={0.5}>
@@ -29,13 +32,13 @@ export default function AnalyticEcommerce({ color = 'primary', title, count, per
               {count}
             </Typography>
           </Grid>
-          {percentage && (
+          {showPercentage && (
             <Grid item>
               <Chip
                 variant="combined"
                 color={color}
                 icon={isLoss ? <FallOutlined style={iconSX} /> : <RiseOutlined style={iconSX} />}
-                label={`${percentage}%`}
+                label={`${percentageNumber}%`}
                 sx={{ ml: 1.25, pl: 1 }}
                 size="small"
               />
@@ -43,15 +46,13 @@ export default function AnalyticEcommerce({ color = 'primary', title, count, per
           )}
         </Grid>
       </Stack>
-      <Box sx={{ pt: 2.25 }}>
-        <Typography variant="caption" color="text.secondary">
-          You made an extra{' '}
+      {extra && (
+        <Box sx={{ pt: 2.25 }}>
           <Typography variant="caption" sx={{ color: `${color || 'primary'}.main` }}>
             {extra}
-          </Typography>{' '}
-          this year
-        </Typography>
-      </Box>
+          </Typography>
+        </Box>
+      )}
     </MainCard>
   );
 }

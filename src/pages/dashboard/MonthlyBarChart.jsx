@@ -1,80 +1,72 @@
+import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 // third-party
 import ReactApexChart from 'react-apexcharts';
 
-// chart options
-const barChartOptions = {
-  chart: {
-    type: 'bar',
-    height: 365,
-    toolbar: {
-      show: false
-    }
-  },
-  plotOptions: {
-    bar: {
-      columnWidth: '45%',
-      borderRadius: 4
-    }
-  },
-  dataLabels: {
-    enabled: false
-  },
-  xaxis: {
-    categories: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
-    axisBorder: {
-      show: false
-    },
-    axisTicks: {
-      show: false
-    }
-  },
-  yaxis: {
-    show: false
-  },
-  grid: {
-    show: false
-  }
-};
+// ==============================|| CATEGORY DONUT CHART ||============================== //
 
-// ==============================|| MONTHLY BAR CHART ||============================== //
-
-export default function MonthlyBarChart() {
+export default function MonthlyBarChart({ data }) {
   const theme = useTheme();
-
-  const { primary, secondary } = theme.palette.text;
-  const info = theme.palette.info.light;
-
-  const [series] = useState([
-    {
-      data: [80, 95, 70, 42, 65, 55, 78]
-    }
-  ]);
-
-  const [options, setOptions] = useState(barChartOptions);
+  const [chartData, setChartData] = useState({ series: [], options: {} });
 
   useEffect(() => {
-    setOptions((prevState) => ({
-      ...prevState,
-      colors: [info],
-      xaxis: {
-        labels: {
-          style: {
-            colors: [secondary, secondary, secondary, secondary, secondary, secondary, secondary]
-          }
+    if (!data || data.length === 0) return;
+
+    const series = data.map((d) => d.total);
+    const labels = data.map((d) => d.category.charAt(0).toUpperCase() + d.category.slice(1));
+
+    setChartData({
+      series,
+      options: {
+        chart: { type: 'donut' },
+        labels,
+        legend: { position: 'bottom' },
+        colors: [
+          theme.palette.primary.main,
+          theme.palette.success.main,
+          theme.palette.warning.main,
+          theme.palette.error.main,
+          theme.palette.info.main,
+          theme.palette.secondary.main,
+          '#8884d8',
+          '#82ca9d',
+          '#ffc658'
+        ],
+        plotOptions: {
+          pie: { donut: { size: '55%' } }
+        },
+        dataLabels: {
+          enabled: true,
+          formatter: (val) => `${val.toFixed(1)}%`
+        },
+        tooltip: {
+          y: { formatter: (val) => `$${val.toFixed(2)}` }
         }
       }
-    }));
-  }, [primary, info, secondary]);
+    });
+  }, [data, theme]);
+
+  if (!data || data.length === 0) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography color="text.secondary" align="center">No category data</Typography>
+      </Box>
+    );
+  }
+
+  if (chartData.series.length === 0) return null;
 
   return (
-    <Box id="chart" sx={{ bgcolor: 'transparent' }}>
-      <ReactApexChart options={options} series={series} type="bar" height={365} />
+    <Box id="category-chart">
+      <ReactApexChart options={chartData.options} series={chartData.series} type="donut" height={300} />
     </Box>
   );
 }
+
+MonthlyBarChart.propTypes = { data: PropTypes.array };
